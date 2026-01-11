@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Icon</title>
+    <style>
+        body { font-family: Arial; padding: 40px; text-align: center; }
+        canvas { border: 1px solid #ccc; margin: 20px; }
+        button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: #fbbf24; border: none; border-radius: 8px; }
+        button:hover { background: #f59e0b; }
+    </style>
+</head>
+<body>
+    <h1>Daily Chuckle Icon Generator</h1>
+    <p>Click the button to download the icon as PNG</p>
+    <canvas id="canvas" width="192" height="192"></canvas>
+    <br>
+    <button onclick="downloadIcon()">Download icon-192.png</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Draw gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 192, 192);
+        gradient.addColorStop(0, '#fbbf24');
+        gradient.addColorStop(1, '#f59e0b');
+
+        // Draw rounded rectangle
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 192, 192, 40);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Draw emoji
+        ctx.font = '100px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('😄', 96, 96);
+
+        function downloadIcon() {
+            const link = document.createElement('a');
+            link.download = 'icon-192.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>

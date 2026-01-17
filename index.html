@@ -704,7 +704,7 @@
             <div class="section">
                 <div class="section-header">
                     <span class="section-emoji">🧠</span>
-                    <h2 class="section-title">Brain Teaser</h2>
+                    <h2 class="section-title">Trivia</h2>
                 </div>
                 <div class="quiz-text" id="quizText"></div>
                 <div class="quiz-options" id="quizOptions"></div>
@@ -1661,6 +1661,7 @@
         function fuzzyMatch(userAnswer, correctAnswers) {
             if (!userAnswer) return false;
             const normalized = userAnswer.toLowerCase().trim().replace(/[^a-z0-9\s]/g, '');
+            if (!normalized) return false; // Reject empty strings after normalization (e.g., "?")
             return correctAnswers.some(ans => {
                 const normalizedAns = ans.toLowerCase().trim();
                 return normalized.includes(normalizedAns) || normalizedAns.includes(normalized);

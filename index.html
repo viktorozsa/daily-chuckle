@@ -694,7 +694,7 @@
             <div class="section">
                 <div class="section-header">
                     <span class="section-emoji">😄</span>
-                    <h2 class="section-title">Fill in the Punchline</h2>
+                    <h2 class="section-title">Joking Joke</h2>
                 </div>
                 <div class="joke-text" id="jokeText"></div>
                 <input type="text" id="jokeAnswer" placeholder="The punchline is..." autocomplete="off">
@@ -1620,7 +1620,7 @@
             const jokeCorrect = fuzzyMatch(jokeAnswer, content.joke.answers);
             if (jokeCorrect) score++;
             results.push({
-                type: 'Joke Punchline',
+                type: 'Joking Joke',
                 emoji: '😄',
                 correct: jokeCorrect,
                 userAnswer: jokeAnswer || '(no answer)',
@@ -1770,7 +1770,7 @@
 
             const jokeCorrect = fuzzyMatch(userAnswers.joke, content.joke.answers);
             results.push({
-                type: 'Joke Punchline',
+                type: 'Joking Joke',
                 emoji: '😄',
                 correct: jokeCorrect,
                 userAnswer: userAnswers.joke || '(no answer)',

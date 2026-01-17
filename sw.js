@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daily-chuckle-v2';
+const CACHE_NAME = 'daily-chuckle-v3';
 const urlsToCache = [
     './',
     './index.html',

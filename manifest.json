@@ -2,7 +2,7 @@
     "name": "Daily Chuckle",
     "short_name": "Chuckle",
     "description": "Daily riddles, jokes, and brain teasers to brighten your day!",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#fffbea",
     "theme_color": "#fbbf24",

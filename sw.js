@@ -1,9 +1,13 @@
-const CACHE_NAME = 'daily-chuckle-v4';
+const CACHE_NAME = 'daily-chuckle-v5';
 const urlsToCache = [
     './',
     './index.html',
     './manifest.json',
-    './icon-192.png'
+    './icon-192.png',
+    './sound_clips/zero.mp3',
+    './sound_clips/one.mp3',
+    './sound_clips/two.mp3',
+    './sound_clips/three.mp3'
 ];
 
 // Install event - cache files

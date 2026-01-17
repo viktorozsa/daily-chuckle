@@ -1,6 +1,6 @@
 {
-    "name": "Daily Chuckle",
-    "short_name": "Chuckle",
+    "name": "Daily Chuckle 🐛",
+    "short_name": "Daily Chuckle 🐛",
     "description": "Daily riddles, jokes, and brain teasers to brighten your day!",
     "start_url": "./",
     "display": "standalone",

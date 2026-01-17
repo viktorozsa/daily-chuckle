@@ -669,7 +669,7 @@
                 <span>🔥</span>
                 <span id="streakCount">0</span> day streak
             </div>
-            <div class="day-badge" id="dayDisplay">Day 1</div>
+            <div class="day-badge" id="dayDisplay"></div>
         </div>
         <h1>
             <span class="wiggle">D</span>aily
@@ -1569,7 +1569,8 @@
             const dayIndex = getDayIndex();
             const content = contentBank[dayIndex];
 
-            document.getElementById('dayDisplay').textContent = `Day ${dayIndex + 1}`;
+            const today = new Date();
+            document.getElementById('dayDisplay').textContent = today.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
             document.getElementById('riddleText').textContent = content.riddle.text;
             document.getElementById('jokeText').textContent = content.joke.text;
             document.getElementById('quizText').textContent = content.quiz.text;

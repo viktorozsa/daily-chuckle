@@ -5,13 +5,13 @@
     <style>
         body { font-family: Arial; padding: 40px; text-align: center; }
         canvas { border: 1px solid #ccc; margin: 20px; }
-        button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: #fbbf24; border: none; border-radius: 8px; }
+        button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: #fbbf24; border: none; border-radius: 8px; margin: 5px; }
         button:hover { background: #f59e0b; }
     </style>
 </head>
 <body>
     <h1>Daily Chuckle Icon Generator</h1>
-    <p>Click the button to download the icon as PNG</p>
+    <p>Loading emoji from Twemoji...</p>
     <canvas id="canvas" width="192" height="192"></canvas>
     <br>
     <button onclick="downloadIcon()">Download icon-192.png</button>
@@ -25,17 +25,24 @@
         gradient.addColorStop(0, '#fbbf24');
         gradient.addColorStop(1, '#f59e0b');
 
-        // Draw rounded rectangle
         ctx.beginPath();
         ctx.roundRect(0, 0, 192, 192, 40);
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        // Draw emoji
-        ctx.font = '100px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🐛', 96, 96);
+        // Load bug emoji from Twemoji (Twitter's open source emoji)
+        const emojiImg = new Image();
+        emojiImg.crossOrigin = 'anonymous';
+        emojiImg.onload = function() {
+            // Draw emoji centered, sized to 120x120
+            ctx.drawImage(emojiImg, 36, 36, 120, 120);
+            document.querySelector('p').textContent = 'Icon ready! Click download.';
+        };
+        emojiImg.onerror = function() {
+            document.querySelector('p').textContent = 'Failed to load emoji. Try refreshing.';
+        };
+        // Caterpillar emoji U+1F41B
+        emojiImg.src = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f41b.png';
 
         function downloadIcon() {
             const link = document.createElement('a');

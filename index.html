@@ -1675,7 +1675,7 @@
             return saved ? JSON.parse(saved) : null;
         }
 
-        function saveCompletion(score, isChampion) {
+        function saveCompletion(score, isChampion, userAnswers) {
             const todayKey = getTodayKey();
             const streak = updateStreak(isChampion);
             localStorage.setItem(todayKey, JSON.stringify({
@@ -1683,6 +1683,7 @@
                 score: score,
                 isChampion: isChampion,
                 streak: streak,
+                userAnswers: userAnswers,
                 timestamp: Date.now()
             }));
             return streak;
@@ -1757,7 +1758,7 @@
             if (quizCorrect) score++;
             const correctIndex = ['A', 'B', 'C', 'D'].indexOf(content.quiz.correct);
             results.push({
-                type: 'Brain Teaser',
+                type: 'Trivia',
                 emoji: '🧠',
                 correct: quizCorrect,
                 userAnswer: quizAnswer ? `${quizAnswer}. ${content.quiz.options[['A', 'B', 'C', 'D'].indexOf(quizAnswer)]}` : '(no answer)',
@@ -1766,12 +1767,13 @@
             });
 
             const isChampion = score >= 2;
-            const streak = saveCompletion(score, isChampion);
+            const userAnswers = { riddle: riddleAnswer, joke: jokeAnswer, quiz: quizAnswer };
+            const streak = saveCompletion(score, isChampion, userAnswers);
 
-            showResults(score, results, content.pun, isChampion, streak);
+            showResults(score, results, content.pun, isChampion, streak, false);
         }
 
-        function showResults(score, results, pun, isChampion, streak) {
+        function showResults(score, results, pun, isChampion, streak, skipAnimations = false) {
             document.getElementById('challengeSection').classList.add('hidden');
             document.getElementById('resultsSection').style.display = 'block';
             document.getElementById('submitContainer').classList.add('hidden');
@@ -1784,7 +1786,6 @@
 
             // Handle different score outcomes
             if (score === 0) {
-                // TOTAL FAIL - 0 correct - HEAD BANGING
                 scoreDisplay.classList.add('sad');
                 scoreLabel.textContent = "Oh no...";
                 resultCharacter.innerHTML = `
@@ -1794,12 +1795,13 @@
                     </div>
                     <div class="wakeup-text">WAKE UP, SLEEPY...<br>YOU'RE NOT A CHUCKLE CHAMPION TODAY!</div>
                 `;
-                setTimeout(() => {
-                    AudioSystem.sayWakeUp();
-                }, 300);
+                if (!skipAnimations) {
+                    setTimeout(() => {
+                        AudioSystem.sayWakeUp();
+                    }, 300);
+                }
 
             } else if (score === 1) {
-                // BAD LUCK - 1 correct - CRYING WITH TEARS
                 scoreDisplay.classList.add('sad');
                 scoreLabel.textContent = "Better luck next time!";
                 resultCharacter.innerHTML = `
@@ -1811,37 +1813,37 @@
                         <span class="tear tear-right-2">💧</span>
                     </div>
                 `;
-                setTimeout(() => {
-                    AudioSystem.sayBadLuck();
-                }, 300);
+                if (!skipAnimations) {
+                    setTimeout(() => {
+                        AudioSystem.sayBadLuck();
+                    }, 300);
+                }
 
             } else if (score === 2) {
-                // YOU GOT IT - 2 correct (Champion) - FIREWORKS!
                 scoreDisplay.classList.add('champion');
                 scoreLabel.textContent = "Chuckle Champion!";
                 resultCharacter.innerHTML = '<div class="sad-person">🎉</div>';
-                setTimeout(() => {
-                    AudioSystem.sayYouGotIt();
-                    FireworksSystem.start(4000);
-                }, 300);
+                if (!skipAnimations) {
+                    setTimeout(() => {
+                        AudioSystem.sayYouGotIt();
+                        FireworksSystem.start(4000);
+                    }, 300);
+                }
 
             } else if (score === 3) {
-                // PERFECT - 3 correct - FART + PILLOW THROW (no fireworks!)
                 scoreDisplay.classList.add('champion');
                 scoreLabel.textContent = "PERFECT! Chuckle Champion!";
-
-                // Pillow thrower animation
                 resultCharacter.innerHTML = `
                     <div class="pillow-thrower">
                         <span class="pillow-person">💪😎</span>
                         <span class="flying-pillow">🛏️</span>
                     </div>
                 `;
-
-                // Play the fart sound immediately
-                setTimeout(() => {
-                    AudioSystem.playFartSound();
-                }, 200);
+                if (!skipAnimations) {
+                    setTimeout(() => {
+                        AudioSystem.playFartSound();
+                    }, 200);
+                }
             }
 
             const resultsContainer = document.getElementById('resultsContainer');
@@ -1886,16 +1888,44 @@
 
         // ==================== COMPLETED STATE ====================
         function showCompletedState(savedData) {
-            document.getElementById('challengeSection').classList.add('hidden');
-            document.getElementById('submitContainer').classList.add('hidden');
-            document.getElementById('completedSection').classList.remove('hidden');
-            document.getElementById('completedScore').textContent = `${savedData.score}/3`;
+            const dayIndex = getDayIndex();
+            const content = contentBank[dayIndex];
+            const userAnswers = savedData.userAnswers || { riddle: '', joke: '', quiz: '' };
 
-            if (savedData.isChampion && savedData.streak > 0) {
-                const completedStreak = document.getElementById('completedStreak');
-                completedStreak.classList.remove('hidden');
-                completedStreak.textContent = `🔥 ${savedData.streak} day streak!`;
-            }
+            // Rebuild results from stored answers
+            const results = [];
+
+            const riddleCorrect = fuzzyMatch(userAnswers.riddle, content.riddle.answers);
+            results.push({
+                type: 'Riddle',
+                emoji: '🎭',
+                correct: riddleCorrect,
+                userAnswer: userAnswers.riddle || '(no answer)',
+                correctAnswer: content.riddle.answers[0]
+            });
+
+            const jokeCorrect = fuzzyMatch(userAnswers.joke, content.joke.answers);
+            results.push({
+                type: 'Joke Punchline',
+                emoji: '😄',
+                correct: jokeCorrect,
+                userAnswer: userAnswers.joke || '(no answer)',
+                correctAnswer: content.joke.answers[0]
+            });
+
+            const quizCorrect = userAnswers.quiz === content.quiz.correct;
+            const correctIndex = ['A', 'B', 'C', 'D'].indexOf(content.quiz.correct);
+            results.push({
+                type: 'Trivia',
+                emoji: '🧠',
+                correct: quizCorrect,
+                userAnswer: userAnswers.quiz ? `${userAnswers.quiz}. ${content.quiz.options[['A', 'B', 'C', 'D'].indexOf(userAnswers.quiz)]}` : '(no answer)',
+                correctAnswer: `${content.quiz.correct}. ${content.quiz.options[correctIndex]}`,
+                explanation: content.quiz.explanation
+            });
+
+            // Show results without animations/sounds
+            showResults(savedData.score, results, content.pun, savedData.isChampion, savedData.streak, true);
         }
 
         // ==================== INITIALIZATION ====================

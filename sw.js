@@ -1,9 +1,9 @@
-const CACHE_NAME = 'daily-chuckle-v1';
+const CACHE_NAME = 'daily-chuckle-v2';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/icon-192.png'
+    './',
+    './index.html',
+    './manifest.json',
+    './icon-192.png'
 ];
 
 // Install event - cache files
@@ -62,7 +62,7 @@ self.addEventListener('fetch', event => {
             })
             .catch(() => {
                 // Return offline page if available
-                return caches.match('/index.html');
+                return caches.match('./index.html');
             })
     );
 });

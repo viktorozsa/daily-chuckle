@@ -866,7 +866,7 @@
 
     <!-- Video Overlay -->
     <div id="videoOverlay" class="video-overlay hidden">
-        <video id="scoreVideo" playsinline></video>
+        <video id="scoreVideo" playsinline muted></video>
         <div id="poopOverlay" class="poop-overlay hidden"></div>
     </div>
 
@@ -1832,11 +1832,9 @@
             const scoreLabel = document.getElementById('scoreLabel');
             const resultCharacter = document.getElementById('resultCharacter');
 
-            // Play audio for this score
+            // Play audio for this score (immediately to stay within user gesture context on mobile)
             if (!skipAnimations) {
-                setTimeout(() => {
-                    AudioSystem.playSound(score);
-                }, 300);
+                AudioSystem.playSound(score);
             }
 
             // Handle different score outcomes

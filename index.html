@@ -397,13 +397,12 @@
 
         .poop-overlay {
             position: absolute;
-            bottom: 10%;
+            top: 0;
             left: 0;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+            height: 100%;
             pointer-events: none;
+            overflow: hidden;
         }
 
         .poop-overlay.hidden {
@@ -411,13 +410,29 @@
         }
 
         .poop-overlay .poop {
-            font-size: 30px;
+            position: absolute;
             animation: poopDrop 0.5s ease-out forwards;
         }
 
         @keyframes poopDrop {
-            0% { transform: translateY(-50px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
+            0% { transform: translateY(-50px) scale(0.5); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .poop-overlay .giant-poop {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 50px;
+            animation: giantPoopGrow 0.4s ease-out forwards;
+            z-index: 10000;
+        }
+
+        @keyframes giantPoopGrow {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            70% { transform: translate(-50%, -50%) scale(12); }
+            100% { transform: translate(-50%, -50%) scale(15); }
         }
 
         /* Bouncing poop pile for 1/3 landing */
@@ -902,6 +917,7 @@
             poopOverlay: null,
             onEndCallback: null,
             poopTimeout: null,
+            poopIntervals: [],
 
             init() {
                 this.overlay = document.getElementById('videoOverlay');
@@ -921,6 +937,8 @@
                 this.poopOverlay.classList.add('hidden');
                 this.poopOverlay.innerHTML = '';
                 if (this.poopTimeout) clearTimeout(this.poopTimeout);
+                if (this.poopIntervals) this.poopIntervals.forEach(id => clearTimeout(id));
+                this.poopIntervals = [];
 
                 // Set video source and show overlay
                 this.video.src = videoSrc;
@@ -932,25 +950,58 @@
                 // Add poop overlay halfway through if specified
                 if (showPoopAt) {
                     this.video.addEventListener('loadedmetadata', () => {
-                        const poopTime = this.video.duration * showPoopAt;
+                        const duration = this.video.duration;
+                        const poopStartTime = duration * showPoopAt;
+                        const poopEndTime = duration * 0.92; // Stop adding poops before giant poop
+                        const giantPoopTime = duration * 0.95; // Giant poop near the end
+
+                        // Start adding poops
                         this.poopTimeout = setTimeout(() => {
-                            this.showPoopEmojis();
-                        }, poopTime * 1000);
+                            this.showPoopEmojis(poopEndTime - poopStartTime);
+                        }, poopStartTime * 1000);
+
+                        // Giant poop at the end
+                        const giantTimeout = setTimeout(() => {
+                            this.showGiantPoop();
+                        }, giantPoopTime * 1000);
+                        this.poopIntervals.push(giantTimeout);
                     }, { once: true });
                 }
             },
 
-            showPoopEmojis() {
+            showPoopEmojis(duration) {
                 this.poopOverlay.classList.remove('hidden');
-                const poops = ['💩', '💩', '💩', '💩', '💩', '💩', '💩'];
-                poops.forEach((poop, i) => {
-                    setTimeout(() => {
+                const poopCount = 12;
+                const intervalTime = (duration * 1000) / poopCount;
+
+                for (let i = 0; i < poopCount; i++) {
+                    const timeoutId = setTimeout(() => {
                         const span = document.createElement('span');
                         span.className = 'poop';
-                        span.textContent = poop;
+                        span.textContent = '💩';
+
+                        // Random horizontal position
+                        const left = 10 + Math.random() * 80; // 10-90% from left
+                        // Random vertical position
+                        const top = 20 + Math.random() * 60; // 20-80% from top
+                        // Size based on vertical position (smaller at top, larger at bottom)
+                        const size = 15 + (top / 80) * 45; // 15px at top, up to 60px at bottom
+
+                        span.style.left = `${left}%`;
+                        span.style.top = `${top}%`;
+                        span.style.fontSize = `${size}px`;
+
                         this.poopOverlay.appendChild(span);
-                    }, i * 100);
-                });
+                    }, i * intervalTime);
+                    this.poopIntervals.push(timeoutId);
+                }
+            },
+
+            showGiantPoop() {
+                const giant = document.createElement('span');
+                giant.className = 'giant-poop';
+                giant.textContent = '💩';
+                this.poopOverlay.appendChild(giant);
             },
 
             fadeOut() {

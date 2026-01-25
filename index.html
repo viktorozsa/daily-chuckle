@@ -365,6 +365,110 @@
             }
         }
 
+        /* Pirate ship for 2/3 score */
+        .pirate-scene {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            height: 140px;
+        }
+
+        .pirate-ship {
+            font-size: 80px;
+            position: absolute;
+            left: 20%;
+            bottom: 0;
+            animation: shipBob 2s ease-in-out infinite;
+        }
+
+        @keyframes shipBob {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        .pirate-captain {
+            position: absolute;
+            left: calc(20% + 35px);
+            bottom: 55px;
+            font-size: 40px;
+            animation: shipBob 2s ease-in-out infinite;
+        }
+
+        .pirate-pegleg {
+            position: absolute;
+            left: calc(20% + 45px);
+            bottom: 35px;
+            font-size: 18px;
+            animation: shipBob 2s ease-in-out infinite;
+        }
+
+        .pirate-parrot {
+            position: absolute;
+            left: calc(20% + 70px);
+            bottom: 90px;
+            font-size: 22px;
+            animation: shipBob 2s ease-in-out infinite, parrotBob 0.5s ease-in-out infinite;
+        }
+
+        @keyframes parrotBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .cannon {
+            position: absolute;
+            left: calc(20% + 90px);
+            bottom: 55px;
+            font-size: 30px;
+            animation: shipBob 2s ease-in-out infinite, cannonRecoil 3s ease-out forwards;
+        }
+
+        @keyframes cannonRecoil {
+            0%, 15% { transform: rotate(0deg); }
+            18% { transform: rotate(-15deg) translateX(-5px); }
+            25% { transform: rotate(0deg); }
+        }
+
+        .cannon-pillow {
+            position: absolute;
+            left: calc(20% + 120px);
+            bottom: 65px;
+            font-size: 35px;
+            opacity: 0;
+            animation: cannonFire 3s ease-out forwards;
+        }
+
+        @keyframes cannonFire {
+            0%, 15% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            18% {
+                transform: translateX(10px) translateY(-10px) rotate(15deg);
+                opacity: 1;
+            }
+            30% {
+                transform: translateX(80px) translateY(-60px) rotate(90deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(180px) translateY(-90px) rotate(200deg);
+                opacity: 1;
+            }
+            70% {
+                transform: translateX(300px) translateY(-70px) rotate(400deg);
+                opacity: 0.8;
+            }
+            90% {
+                transform: translateX(450px) translateY(-40px) rotate(600deg);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateX(550px) translateY(0px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
         /* Crying face with tears */
         .crying-container {
             position: relative;
@@ -1536,7 +1640,7 @@
         function fuzzyMatch(userAnswer, correctAnswers) {
             if (!userAnswer) return false;
             const normalized = userAnswer.toLowerCase().trim().replace(/[^a-z0-9\s]/g, '');
-            if (!normalized) return false; // Reject empty strings after normalization (e.g., "?")
+            if (!normalized || normalized.length < 3) return false; // Reject too-short answers
             return correctAnswers.some(ans => {
                 const normalizedAns = ans.toLowerCase().trim();
                 return normalized.includes(normalizedAns) || normalizedAns.includes(normalized);
@@ -1693,12 +1797,16 @@
             } else if (score === 2) {
                 scoreDisplay.classList.add('champion');
                 scoreLabel.textContent = "Chuckle Champion!";
-                resultCharacter.innerHTML = '<div class="sad-person">🎉</div>';
-                if (!skipAnimations) {
-                    setTimeout(() => {
-                        FireworksSystem.start(4000);
-                    }, 300);
-                }
+                resultCharacter.innerHTML = `
+                    <div class="pirate-scene">
+                        <span class="pirate-ship">⛵</span>
+                        <span class="pirate-captain">🏴‍☠️</span>
+                        <span class="pirate-pegleg">🦿</span>
+                        <span class="pirate-parrot">🦜</span>
+                        <span class="cannon">💣</span>
+                        <span class="cannon-pillow">🛏️</span>
+                    </div>
+                `;
 
             } else if (score === 3) {
                 scoreDisplay.classList.add('champion');
@@ -1709,6 +1817,11 @@
                         <span class="flying-pillow">🛏️</span>
                     </div>
                 `;
+                if (!skipAnimations) {
+                    setTimeout(() => {
+                        FireworksSystem.start(4000);
+                    }, 300);
+                }
             }
 
             const resultsContainer = document.getElementById('resultsContainer');
@@ -1723,7 +1836,7 @@
                         <div class="result-label">${result.emoji} ${result.type}</div>
                         <div class="result-answer">Your answer: ${result.userAnswer}</div>
                         ${!result.correct ? `<div class="result-answer">Correct: ${result.correctAnswer}</div>` : ''}
-                        ${result.explanation && !result.correct ? `<div class="result-explanation">${result.explanation}</div>` : ''}
+                        ${result.explanation ? `<div class="result-explanation">${result.explanation}</div>` : ''}
                     </div>
                 `;
                 resultsContainer.appendChild(div);

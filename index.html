@@ -365,108 +365,103 @@
             }
         }
 
-        /* Pirate ship for 2/3 score */
-        .pirate-scene {
-            position: relative;
-            display: inline-block;
+        /* Video overlay for score animations */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 140px;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
         }
 
-        .pirate-ship {
-            font-size: 80px;
-            position: absolute;
-            left: 20%;
-            bottom: 0;
-            animation: shipBob 2s ease-in-out infinite;
+        .video-overlay.hidden {
+            display: none;
         }
 
-        @keyframes shipBob {
-            0%, 100% { transform: translateY(0) rotate(-2deg); }
-            50% { transform: translateY(-8px) rotate(2deg); }
-        }
-
-        .pirate-captain {
-            position: absolute;
-            left: calc(20% + 35px);
-            bottom: 55px;
-            font-size: 40px;
-            animation: shipBob 2s ease-in-out infinite;
-        }
-
-        .pirate-pegleg {
-            position: absolute;
-            left: calc(20% + 45px);
-            bottom: 35px;
-            font-size: 18px;
-            animation: shipBob 2s ease-in-out infinite;
-        }
-
-        .pirate-parrot {
-            position: absolute;
-            left: calc(20% + 70px);
-            bottom: 90px;
-            font-size: 22px;
-            animation: shipBob 2s ease-in-out infinite, parrotBob 0.5s ease-in-out infinite;
-        }
-
-        @keyframes parrotBob {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
-
-        .cannon {
-            position: absolute;
-            left: calc(20% + 90px);
-            bottom: 55px;
-            font-size: 30px;
-            animation: shipBob 2s ease-in-out infinite, cannonRecoil 3s ease-out forwards;
-        }
-
-        @keyframes cannonRecoil {
-            0%, 15% { transform: rotate(0deg); }
-            18% { transform: rotate(-15deg) translateX(-5px); }
-            25% { transform: rotate(0deg); }
-        }
-
-        .cannon-pillow {
-            position: absolute;
-            left: calc(20% + 120px);
-            bottom: 65px;
-            font-size: 35px;
+        .video-overlay.fade-out {
             opacity: 0;
-            animation: cannonFire 3s ease-out forwards;
         }
 
-        @keyframes cannonFire {
-            0%, 15% {
-                transform: translateX(0) translateY(0) rotate(0deg);
-                opacity: 0;
-            }
-            18% {
-                transform: translateX(10px) translateY(-10px) rotate(15deg);
-                opacity: 1;
-            }
-            30% {
-                transform: translateX(80px) translateY(-60px) rotate(90deg);
-                opacity: 1;
-            }
-            50% {
-                transform: translateX(180px) translateY(-90px) rotate(200deg);
-                opacity: 1;
-            }
-            70% {
-                transform: translateX(300px) translateY(-70px) rotate(400deg);
-                opacity: 0.8;
-            }
-            90% {
-                transform: translateX(450px) translateY(-40px) rotate(600deg);
-                opacity: 0.4;
-            }
-            100% {
-                transform: translateX(550px) translateY(0px) rotate(720deg);
-                opacity: 0;
-            }
+        .video-overlay video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .poop-overlay {
+            position: absolute;
+            bottom: 10%;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .poop-overlay.hidden {
+            display: none;
+        }
+
+        .poop-overlay .poop {
+            font-size: 30px;
+            animation: poopDrop 0.5s ease-out forwards;
+        }
+
+        @keyframes poopDrop {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Bouncing poop pile for 1/3 landing */
+        .poop-pile {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            font-size: 50px;
+        }
+
+        .poop-pile .poop {
+            animation: poopBounce 0.6s ease-in-out infinite;
+        }
+
+        .poop-pile .poop:nth-child(1) { animation-delay: 0s; }
+        .poop-pile .poop:nth-child(2) { animation-delay: 0.1s; }
+        .poop-pile .poop:nth-child(3) { animation-delay: 0.2s; }
+        .poop-pile .poop:nth-child(4) { animation-delay: 0.3s; }
+        .poop-pile .poop:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes poopBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Bouncing pirate landing for 2/3 */
+        .pirate-landing {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 60px;
+        }
+
+        .pirate-landing span {
+            animation: pirateBounce 0.7s ease-in-out infinite;
+        }
+
+        .pirate-landing span:nth-child(1) { animation-delay: 0s; }
+        .pirate-landing span:nth-child(2) { animation-delay: 0.15s; }
+        .pirate-landing span:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes pirateBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
         }
 
         /* Crying face with tears */
@@ -869,6 +864,12 @@
     <!-- Fireworks Canvas -->
     <canvas id="fireworksCanvas"></canvas>
 
+    <!-- Video Overlay -->
+    <div id="videoOverlay" class="video-overlay hidden">
+        <video id="scoreVideo" playsinline></video>
+        <div id="poopOverlay" class="poop-overlay hidden"></div>
+    </div>
+
     <script>
         // ==================== AUDIO SYSTEM ====================
         const AudioSystem = {
@@ -891,6 +892,74 @@
                 const audio = new Audio(soundFiles[score]);
                 audio.play().catch(err => console.log('Audio play failed:', err));
                 this.currentAudio = audio;
+            }
+        };
+
+        // ==================== VIDEO SYSTEM ====================
+        const VideoSystem = {
+            overlay: null,
+            video: null,
+            poopOverlay: null,
+            onEndCallback: null,
+            poopTimeout: null,
+
+            init() {
+                this.overlay = document.getElementById('videoOverlay');
+                this.video = document.getElementById('scoreVideo');
+                this.poopOverlay = document.getElementById('poopOverlay');
+
+                this.video.addEventListener('ended', () => {
+                    this.fadeOut();
+                });
+            },
+
+            play(videoSrc, options = {}) {
+                const { showPoopAt, onEnd } = options;
+                this.onEndCallback = onEnd;
+
+                // Reset state
+                this.poopOverlay.classList.add('hidden');
+                this.poopOverlay.innerHTML = '';
+                if (this.poopTimeout) clearTimeout(this.poopTimeout);
+
+                // Set video source and show overlay
+                this.video.src = videoSrc;
+                this.overlay.classList.remove('hidden', 'fade-out');
+
+                // Play video
+                this.video.play().catch(err => console.log('Video play failed:', err));
+
+                // Add poop overlay halfway through if specified
+                if (showPoopAt) {
+                    this.video.addEventListener('loadedmetadata', () => {
+                        const poopTime = this.video.duration * showPoopAt;
+                        this.poopTimeout = setTimeout(() => {
+                            this.showPoopEmojis();
+                        }, poopTime * 1000);
+                    }, { once: true });
+                }
+            },
+
+            showPoopEmojis() {
+                this.poopOverlay.classList.remove('hidden');
+                const poops = ['💩', '💩', '💩', '💩', '💩', '💩', '💩'];
+                poops.forEach((poop, i) => {
+                    setTimeout(() => {
+                        const span = document.createElement('span');
+                        span.className = 'poop';
+                        span.textContent = poop;
+                        this.poopOverlay.appendChild(span);
+                    }, i * 100);
+                });
+            },
+
+            fadeOut() {
+                this.overlay.classList.add('fade-out');
+                setTimeout(() => {
+                    this.overlay.classList.add('hidden');
+                    this.video.src = '';
+                    if (this.onEndCallback) this.onEndCallback();
+                }, 500);
             }
         };
 
@@ -1639,10 +1708,10 @@
         // ==================== ANSWER MATCHING ====================
         function fuzzyMatch(userAnswer, correctAnswers) {
             if (!userAnswer) return false;
-            const normalized = userAnswer.toLowerCase().trim().replace(/[^a-z0-9\s]/g, '');
+            const normalized = userAnswer.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
             if (!normalized || normalized.length < 3) return false; // Reject too-short answers
             return correctAnswers.some(ans => {
-                const normalizedAns = ans.toLowerCase().trim();
+                const normalizedAns = ans.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
                 return normalized.includes(normalizedAns) || normalizedAns.includes(normalized);
             });
         }
@@ -1701,6 +1770,7 @@
 
         // ==================== SUBMIT & RESULTS ====================
         function submitAnswers() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
             const dayIndex = getDayIndex();
             const content = contentBank[dayIndex];
@@ -1784,29 +1854,38 @@
             } else if (score === 1) {
                 scoreDisplay.classList.add('sad');
                 scoreLabel.textContent = "Better luck next time!";
+                // Show bouncing poop pile as landing (set immediately, video plays over it)
                 resultCharacter.innerHTML = `
-                    <div class="crying-container">
-                        <div class="crying-face">😢</div>
-                        <span class="tear tear-left">💧</span>
-                        <span class="tear tear-right">💧</span>
-                        <span class="tear tear-left-2">💧</span>
-                        <span class="tear tear-right-2">💧</span>
+                    <div class="poop-pile">
+                        <span class="poop">💩</span>
+                        <span class="poop">💩</span>
+                        <span class="poop">💩</span>
+                        <span class="poop">💩</span>
+                        <span class="poop">💩</span>
                     </div>
                 `;
+                // Play video with poop overlay halfway through
+                if (!skipAnimations) {
+                    VideoSystem.play('./video_clips/poopers.mp4', {
+                        showPoopAt: 0.5
+                    });
+                }
 
             } else if (score === 2) {
                 scoreDisplay.classList.add('champion');
                 scoreLabel.textContent = "Chuckle Champion!";
+                // Show bouncing pirate landing (set immediately, video plays over it)
                 resultCharacter.innerHTML = `
-                    <div class="pirate-scene">
-                        <span class="pirate-ship">⛵</span>
-                        <span class="pirate-captain">🏴‍☠️</span>
-                        <span class="pirate-pegleg">🦿</span>
-                        <span class="pirate-parrot">🦜</span>
-                        <span class="cannon">💣</span>
-                        <span class="cannon-pillow">🛏️</span>
+                    <div class="pirate-landing">
+                        <span>🏴‍☠️</span>
+                        <span>🐋</span>
+                        <span>💣</span>
                     </div>
                 `;
+                // Play pirate video
+                if (!skipAnimations) {
+                    VideoSystem.play('./video_clips/pirate.mp4');
+                }
 
             } else if (score === 3) {
                 scoreDisplay.classList.add('champion');
@@ -1908,6 +1987,7 @@
 
         // ==================== INITIALIZATION ====================
         function init() {
+            VideoSystem.init();
             const completed = checkCompleted();
             if (completed) {
                 loadContent();
